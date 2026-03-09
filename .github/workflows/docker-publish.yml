@@ -41,6 +41,7 @@ jobs:
         with:
           context: ./backend
           platforms: ${{ matrix.platform }}
+          provenance: false
           outputs: type=image,name=${{ env.BACKEND_IMAGE }},push-by-digest=true,name-canonical=true,push=true
 
       - run: echo "${{ steps.build.outputs.digest }}" > /tmp/digest.txt
@@ -113,6 +114,7 @@ jobs:
         with:
           context: ./frontend
           platforms: ${{ matrix.platform }}
+          provenance: false
           outputs: type=image,name=${{ env.FRONTEND_IMAGE }},push-by-digest=true,name-canonical=true,push=true
 
       - run: echo "${{ steps.build.outputs.digest }}" > /tmp/digest.txt
