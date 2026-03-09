@@ -4,11 +4,11 @@ A full-stack web application for finding local activity partners. Post activitie
 
 ## Architecture
 
-```
+```text
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│    Frontend      │     │    Backend       │     │   PostgreSQL    │
-│  React + Vite    │────▶│  Spring Boot     │────▶│                 │
-│  Port 5173       │     │  Port 8080       │     │  Port 5433      │
+│    Frontend     │     │    Backend      │     │   PostgreSQL    │
+│  React + Vite   │────▶│  Spring Boot    │────▶│                 │
+│  Port 5173      │     │  Port 8080      │     │   Port 5432     │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
        MUI                   Spring Security
    TanStack Query            JWT Auth
@@ -18,26 +18,26 @@ A full-stack web application for finding local activity partners. Post activitie
 
 ### API Design
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/auth/register` | Register | No |
-| POST | `/api/auth/login` | Login | No |
-| GET | `/api/auth/me` | Current user | Yes |
-| GET | `/api/activities` | List (paginated, filterable) | No |
-| GET | `/api/activities/:id` | Detail with participants | No |
-| POST | `/api/activities` | Create | Yes |
-| PUT | `/api/activities/:id` | Update (creator) | Yes |
-| DELETE | `/api/activities/:id` | Delete (creator) | Yes |
-| PATCH | `/api/activities/:id/cancel` | Cancel (creator) | Yes |
-| PATCH | `/api/activities/:id/complete` | Complete (creator) | Yes |
-| POST | `/api/activities/:id/join` | Join | Yes |
-| DELETE | `/api/activities/:id/leave` | Leave | Yes |
-| GET | `/api/users/me/activities` | My joined activities | Yes |
-| GET | `/api/users/me/created` | My created activities | Yes |
+| Method | Endpoint                       | Description                  | Auth |
+| ------ | ------------------------------ | ---------------------------- | ---- |
+| POST   | `/api/auth/register`           | Register                     | No   |
+| POST   | `/api/auth/login`              | Login                        | No   |
+| GET    | `/api/auth/me`                 | Current user                 | Yes  |
+| GET    | `/api/activities`              | List (paginated, filterable) | No   |
+| GET    | `/api/activities/:id`          | Detail with participants     | No   |
+| POST   | `/api/activities`              | Create                       | Yes  |
+| PUT    | `/api/activities/:id`          | Update (creator)             | Yes  |
+| DELETE | `/api/activities/:id`          | Delete (creator)             | Yes  |
+| PATCH  | `/api/activities/:id/cancel`   | Cancel (creator)             | Yes  |
+| PATCH  | `/api/activities/:id/complete` | Complete (creator)           | Yes  |
+| POST   | `/api/activities/:id/join`     | Join                         | Yes  |
+| DELETE | `/api/activities/:id/leave`    | Leave                        | Yes  |
+| GET    | `/api/users/me/activities`     | My joined activities         | Yes  |
+| GET    | `/api/users/me/created`        | My created activities        | Yes  |
 
 ### Data Model
 
-```
+```text
 users ──────────┐
   id             │
   email          │   activities
@@ -86,7 +86,7 @@ npm install
 npm run dev
 ```
 
-The app is available at http://localhost:5173.
+The app is available at <http://localhost:5173>.
 
 ### Demo Account
 
@@ -101,7 +101,7 @@ Click **"Try Demo Account"** on the login page to instantly log in with a pre-se
 docker compose up --build
 ```
 
-The app is available at http://localhost:3000.
+The app is available at <http://localhost:3000>.
 
 ### Running Tests
 
@@ -117,4 +117,4 @@ npx tsc --noEmit
 
 ### API Documentation
 
-With the backend running, visit http://localhost:8080/swagger-ui.html for interactive API docs.
+With the backend running, visit <http://localhost:8080/swagger-ui.html> for interactive API docs.

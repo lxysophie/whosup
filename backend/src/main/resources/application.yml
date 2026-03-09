@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/whosup
+    url: jdbc:postgresql://localhost:5432/whosup
     username: whosup
     password: whosup
   jpa:
