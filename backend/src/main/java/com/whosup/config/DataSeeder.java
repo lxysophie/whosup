@@ -56,32 +56,32 @@ public class DataSeeder implements ApplicationRunner {
 
         Activity a1 = createActivity("Watch Zootopia 2 at AMC",
                 "Let's go watch Zootopia 2 together! I'll grab the tickets, just Venmo me later.",
-                "AMC Metreon 16, San Francisco",
+                "AMC Empire 25, Times Square",
                 now.plus(2, ChronoUnit.DAYS), ActivityCategory.MOVIES, 4, demo);
 
         Activity a2 = createActivity("Morning Tennis Match",
                 "Looking for a doubles partner. Intermediate level preferred. I'll bring extra rackets.",
-                "Golden Gate Park Tennis Courts",
+                "Central Park Tennis Center",
                 now.plus(1, ChronoUnit.DAYS), ActivityCategory.SPORTS, 4, alice);
 
         createActivity("Study Session - Data Structures",
                 "Prepping for midterms. Let's work through practice problems together.",
-                "Main Library, Room 302",
+                "Butler Library, Columbia University",
                 now.plus(3, ChronoUnit.DAYS), ActivityCategory.STUDY, 6, demo);
 
-        createActivity("Ramen Crawl in Japantown",
-                "Trying 3 different ramen spots. Bring your appetite!",
-                "Japantown, San Francisco",
+        createActivity("Dumpling Crawl in Flushing",
+                "Hitting up 3 spots on Main Street. Bring your appetite!",
+                "Flushing, Queens",
                 now.plus(5, ChronoUnit.DAYS), ActivityCategory.DINING, 5, alice);
 
-        createActivity("Sunset Hike at Twin Peaks",
-                "Easy 2-mile hike with amazing city views. Meet at the parking lot.",
-                "Twin Peaks, San Francisco",
+        createActivity("Sunset Hike at Bear Mountain",
+                "Moderate 4-mile loop with Hudson Valley views. Meet at the parking lot.",
+                "Bear Mountain State Park, NY",
                 now.plus(4, ChronoUnit.DAYS), ActivityCategory.OUTDOORS, 8, demo);
 
-        createActivity("Board Game Night",
+        createActivity("Board Game Night in Williamsburg",
                 "Bringing Catan, Ticket to Ride, and Codenames. Snacks provided!",
-                "Student Union Building, Room 101",
+                "Hex & Co, Brooklyn",
                 now.plus(6, ChronoUnit.DAYS), ActivityCategory.GAMING, 8, alice);
 
         participationRepository.save(new Participation(alice, a1));
