@@ -19,16 +19,16 @@ jobs:
         include:
           - runner: ubuntu-latest
             platform: linux/amd64
+            suffix: amd64
           - runner: ubuntu-24.04-arm
             platform: linux/arm64
+            suffix: arm64
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
     steps:
       - uses: actions/checkout@v4
-
-      - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
         with:
@@ -37,19 +37,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/build-push-action@v6
-        id: build
         with:
           context: ./backend
-          platforms: ${{ matrix.platform }}
           provenance: false
-          outputs: type=image,name=${{ env.BACKEND_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-
-      - run: echo "${{ steps.build.outputs.digest }}" > /tmp/digest.txt
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backend-digest-${{ matrix.runner }}
-          path: /tmp/digest.txt
+          push: true
+          tags: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-${{ matrix.suffix }}
 
   merge-backend:
     needs: build-backend
@@ -58,33 +50,24 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: backend-digest-*
-          path: /tmp/digests
-          merge-multiple: true
-
-      - uses: docker/setup-buildx-action@v3
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/metadata-action@v5
-        id: meta
-        with:
-          images: ${{ env.BACKEND_IMAGE }}
-          tags: |
-            type=sha
-            type=raw,value=latest
-
       - name: Create multi-arch manifest
-        working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(for f in *; do echo "${{ env.BACKEND_IMAGE }}@$(cat $f)"; done)
+          docker manifest create ${{ env.BACKEND_IMAGE }}:latest \
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-amd64 \
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-arm64
+
+          docker manifest create ${{ env.BACKEND_IMAGE }}:sha-${GITHUB_SHA::7} \
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-amd64 \
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-arm64
+
+          docker manifest push ${{ env.BACKEND_IMAGE }}:latest
+          docker manifest push ${{ env.BACKEND_IMAGE }}:sha-${GITHUB_SHA::7}
 
   build-frontend:
     strategy:
@@ -92,16 +75,16 @@ jobs:
         include:
           - runner: ubuntu-latest
             platform: linux/amd64
+            suffix: amd64
           - runner: ubuntu-24.04-arm
             platform: linux/arm64
+            suffix: arm64
     runs-on: ${{ matrix.runner }}
     permissions:
       contents: read
       packages: write
     steps:
       - uses: actions/checkout@v4
-
-      - uses: docker/setup-buildx-action@v3
 
       - uses: docker/login-action@v3
         with:
@@ -110,19 +93,11 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: docker/build-push-action@v6
-        id: build
         with:
           context: ./frontend
-          platforms: ${{ matrix.platform }}
           provenance: false
-          outputs: type=image,name=${{ env.FRONTEND_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-
-      - run: echo "${{ steps.build.outputs.digest }}" > /tmp/digest.txt
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: frontend-digest-${{ matrix.runner }}
-          path: /tmp/digest.txt
+          push: true
+          tags: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-${{ matrix.suffix }}
 
   merge-frontend:
     needs: build-frontend
@@ -131,30 +106,21 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: frontend-digest-*
-          path: /tmp/digests
-          merge-multiple: true
-
-      - uses: docker/setup-buildx-action@v3
-
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: docker/metadata-action@v5
-        id: meta
-        with:
-          images: ${{ env.FRONTEND_IMAGE }}
-          tags: |
-            type=sha
-            type=raw,value=latest
-
       - name: Create multi-arch manifest
-        working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(for f in *; do echo "${{ env.FRONTEND_IMAGE }}@$(cat $f)"; done)
+          docker manifest create ${{ env.FRONTEND_IMAGE }}:latest \
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-amd64 \
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-arm64
+
+          docker manifest create ${{ env.FRONTEND_IMAGE }}:sha-${GITHUB_SHA::7} \
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-amd64 \
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-arm64
+
+          docker manifest push ${{ env.FRONTEND_IMAGE }}:latest
+          docker manifest push ${{ env.FRONTEND_IMAGE }}:sha-${GITHUB_SHA::7}
