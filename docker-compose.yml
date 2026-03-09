@@ -27,6 +27,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend/src
 
   frontend:
     build: ./frontend
@@ -34,6 +38,10 @@ services:
       - "3000:80"
     depends_on:
       - backend
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend/src
 
 volumes:
   pgdata:
