@@ -4,8 +4,10 @@ import com.whosup.entity.*;
 import com.whosup.repository.ActivityRepository;
 import com.whosup.repository.ParticipationRepository;
 import com.whosup.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Component
+@ConditionalOnProperty(name = "app.seed-data", havingValue = "true")
 public class DataSeeder implements ApplicationRunner {
 
     private final UserRepository userRepository;
