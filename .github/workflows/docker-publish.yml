@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'backend/**'
-      - 'frontend/**'
+      - "backend/**"
+      - "frontend/**"
   workflow_dispatch:
 
 env:
@@ -39,7 +39,6 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: ./backend
-          provenance: false
           push: true
           tags: ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-${{ matrix.suffix }}
 
@@ -95,7 +94,6 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: ./frontend
-          provenance: false
           push: true
           tags: ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-${{ matrix.suffix }}
 
