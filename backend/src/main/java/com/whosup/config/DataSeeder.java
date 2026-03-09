@@ -12,9 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Component
 @ConditionalOnProperty(name = "app.seed-data", havingValue = "true")
@@ -24,22 +24,26 @@ public class DataSeeder implements ApplicationRunner {
     private final ActivityRepository activityRepository;
     private final ParticipationRepository participationRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EntityManager entityManager;
 
     public DataSeeder(UserRepository userRepository, ActivityRepository activityRepository,
-                      ParticipationRepository participationRepository, PasswordEncoder passwordEncoder) {
+                      ParticipationRepository participationRepository, PasswordEncoder passwordEncoder,
+                      EntityManager entityManager) {
         this.userRepository = userRepository;
         this.activityRepository = activityRepository;
         this.participationRepository = participationRepository;
         this.passwordEncoder = passwordEncoder;
+        this.entityManager = entityManager;
     }
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (userRepository.count() == 0) {
-            seed();
-        }
-        refreshExpiredSeedActivities();
+        participationRepository.deleteAllInBatch();
+        activityRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
+        entityManager.flush();
+        seed();
     }
 
     private void seed() {
@@ -82,21 +86,6 @@ public class DataSeeder implements ApplicationRunner {
 
         participationRepository.save(new Participation(alice, a1));
         participationRepository.save(new Participation(demo, a2));
-    }
-
-    private void refreshExpiredSeedActivities() {
-        Instant now = Instant.now();
-        List<Activity> expired = activityRepository.findAll().stream()
-                .filter(a -> a.getActivityDate().isBefore(now))
-                .toList();
-
-        int offset = 1;
-        for (Activity activity : expired) {
-            activity.setActivityDate(now.plus(offset, ChronoUnit.DAYS));
-            activity.setStatus(ActivityStatus.OPEN);
-            activityRepository.save(activity);
-            offset++;
-        }
     }
 
     private Activity createActivity(String title, String description, String location,
