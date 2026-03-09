@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Component
 public class DataSeeder implements ApplicationRunner {
@@ -32,10 +33,13 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (userRepository.count() > 0) {
-            return; // already seeded
+        if (userRepository.count() == 0) {
+            seed();
         }
+        refreshExpiredSeedActivities();
+    }
 
+    private void seed() {
         String hashedPassword = passwordEncoder.encode("demo1234");
 
         User demo = userRepository.save(new User("demo@whosup.com", hashedPassword, "Demo User"));
@@ -73,9 +77,23 @@ public class DataSeeder implements ApplicationRunner {
                 "Student Union Building, Room 101",
                 now.plus(6, ChronoUnit.DAYS), ActivityCategory.GAMING, 8, alice);
 
-        // Cross-participation
         participationRepository.save(new Participation(alice, a1));
         participationRepository.save(new Participation(demo, a2));
+    }
+
+    private void refreshExpiredSeedActivities() {
+        Instant now = Instant.now();
+        List<Activity> expired = activityRepository.findAll().stream()
+                .filter(a -> a.getActivityDate().isBefore(now))
+                .toList();
+
+        int offset = 1;
+        for (Activity activity : expired) {
+            activity.setActivityDate(now.plus(offset, ChronoUnit.DAYS));
+            activity.setStatus(ActivityStatus.OPEN);
+            activityRepository.save(activity);
+            offset++;
+        }
     }
 
     private Activity createActivity(String title, String description, String location,
