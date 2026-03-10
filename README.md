@@ -1,6 +1,6 @@
 # WhosUp
 
-A full-stack web application for finding local activity partners. Post activities like "Watch Zootopia 2 at AMC tonight" or "Morning tennis at Golden Gate Park" and find people to join you.
+A full-stack web application for finding local activity partners. Post activities like "Watch Zootopia 2 at AMC Empire 25" or "Morning tennis at Central Park" and find people to join you.
 
 ## Architecture
 
@@ -38,7 +38,7 @@ A full-stack web application for finding local activity partners. Post activitie
 ### Data Model
 
 ```text
-users ──────────┐
+users ───────────┐
   id             │
   email          │   activities
   password       │     id
@@ -60,7 +60,7 @@ users ──────────┐
 
 **Frontend:** TypeScript, React 18, Vite, MUI, React Router, TanStack Query, React Hook Form + Zod, Axios
 
-**DevOps:** Docker Compose, GitHub Actions CI
+**DevOps:** Docker Compose, GitHub Actions CI/CD, multi-arch Docker images (amd64/arm64) on GHCR, Kubernetes (K3s)
 
 ## Getting Started
 
@@ -114,6 +114,20 @@ cd backend
 cd frontend
 npx tsc --noEmit
 ```
+
+### Deploy to Kubernetes (K3s)
+
+Pre-built multi-arch images are published to GitHub Container Registry on every push to `main`.
+
+```bash
+kubectl apply -f k8s/namespace.yml
+kubectl apply -f k8s/postgres.yml
+kubectl apply -f k8s/backend.yml
+kubectl apply -f k8s/frontend.yml
+kubectl apply -f k8s/ingress.yml
+```
+
+A daily CronJob restarts the backend to re-seed fresh demo data.
 
 ### API Documentation
 
