@@ -5,8 +5,14 @@ metadata:
   namespace: whosup
 data:
   default.conf: |
+    map $http_user_agent $loggable {
+        ~kube-probe 0;
+        default     1;
+    }
+
     server {
         listen 80;
+        access_log /var/log/nginx/access.log combined if=$loggable;
 
         location /api/ {
             proxy_pass http://backend:8080/api/;
